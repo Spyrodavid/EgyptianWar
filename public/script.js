@@ -38,20 +38,37 @@ function shuffle()
 function renderDeck(deck)
 {
 	document.getElementById('deck').innerHTML = '';
+	console.log(deck)
 	for(var i = 0; i < deck.length; i++)
 	{
 		var card = document.createElement("div");
 		var icon = '';
-		if (deck[i].Suit == 'hearts')
+		var divsuit = document.createElement('div')
+		//define icon
+		if (deck[i].Value == "A" && deck[i].Suit == "spades"){
+			divsuit.classList.add('aceofspades')
+			icon = '♠';
+		}
+		else if (deck[i].Suit == 'hearts'){
 		icon='♥';
-		else if (deck[i].Suit == 'spades')
+		divsuit.classList.add("hearts")
+		}
+		else if (deck[i].Suit == 'spades'){
 		icon = '♠';
-		else if (deck[i].Suit == 'diamonds')
+		divsuit.classList.add("spades")
+		}
+		else if (deck[i].Suit == 'diamonds'){
 		icon = '♦';
-		else
+		divsuit.classList.add("diamonds")
+		}
+		else {
 		icon = '♣';
-
-		card.innerHTML = deck[i].Value + '' + icon;
+		divsuit.classList.add("clubs")
+		}
+		
+		divsuit.innerHTML = icon
+		card.innerHTML = deck[i].Value 
+		card.appendChild(divsuit)
 		card.className = 'card';
 	document.getElementById("deck").appendChild(card);
 	}

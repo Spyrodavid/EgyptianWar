@@ -8,6 +8,7 @@
 	background-color: white;
 	padding: 3px 3px 3px 3px;
 	margin: 5px;
+	font-size: 30;
 }
 
 .card2
@@ -24,10 +25,6 @@
             border:solid 3px;
 }
 
-.card .value{
-	font-size:15pt;
-	font-family: sans-serif;
-}
 
 .card .suit
 {
@@ -37,18 +34,31 @@
     text-align: center;
 }
 
+.card > div{
+	font-size: 120px;
+	text-align: center;
+	text-align: top;
+}
+
 .card .diamonds
 {
-	background-position-y: 100px;
+	color: red;
 }
 
 .card .hearts
 {
-	background-position-x: 90px;
+	color: red;
 }
 
 .card .clubs
 {
-	background-position-x:90px;
-	background-position-y:100px;
+
+}
+
+.card .spades {
+
+}
+
+.card .aceofspades {
+	color: goldenrod;
 }
