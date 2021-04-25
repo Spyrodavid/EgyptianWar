@@ -11,6 +11,10 @@
 	font-size: 30;
 }
 
+#deck {
+	display: flex;
+  justify-content: center;
+}
 .card2
 {
             width: 50px;

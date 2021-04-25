@@ -17,22 +17,20 @@ http.listen(port, () => {
 });
 
 io.on('connection', socket=> {
+	io.emit('renderCard', {'Value':'A','Suit': 'spades'})
     users[socket.id] = ''
     socket.on('disconnect', (socket)=> {
         getUsers().then((ids)=>{
-			for(user of ids){
-				if (!users.hasOwnProperty(user)){
-					delete users.user
-					console.log(123)
-				
+			for(user of Object.keys(users)){
+				if (!ids.has(user)){
+					delete users[user]				
 			}}
 		})
     })
 })
 
 async function getUsers(socket) {
-    return await io.allSockets().then( )
-   
+    return await io.allSockets()
 }
 
 setInterval(()=>console.log(users),1000)
@@ -71,13 +69,14 @@ function shuffle(deck)
 		deck[location1] = deck[location2];
 		deck[location2] = tmp;
 	}
+	return deck
 }
+
 function dealCards(deck){
-    for (user of users){
-
-    }
-
+    jump = Math.floor(deck.legnth/users.length)
+	for(x=0;x<users.legnth;x+=1){
+		deck.slice(x*jump, (x+1)*jump)
+	}
 }
-
 
 startGame()
