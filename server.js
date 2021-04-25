@@ -17,21 +17,22 @@ http.listen(port, () => {
 });
 
 io.on('connection', socket=> {
-    setUsers()
+    users[socket.id] = ''
     socket.on('disconnect', (socket)=> {
-        setUsers()
+        getUsers().then((ids)=>{
+			for(user of ids){
+				if (!users.hasOwnProperty(user)){
+					delete users.user
+					console.log(123)
+				
+			}}
+		})
     })
 })
 
-async function setUsers() {
-    stillUsers = await io.allSockets();
-    console.log(stillUsers)
-    for(user of stillUsers){
-        if ((users.hasOwnProperty(user))){
-            delete users.user
-            console.log(123)
-        }
-    }
+async function getUsers(socket) {
+    return await io.allSockets().then( )
+   
 }
 
 setInterval(()=>console.log(users),1000)
