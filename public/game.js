@@ -1,3 +1,5 @@
+var scoreDiv = document.getElementById('score')
+var notTurn = document.getElementById('notTurn')
 function renderCard(deck)
 {
 	document.getElementById('deck').innerHTML = '';
@@ -32,3 +34,24 @@ function renderCard(deck)
 	card.className = 'card';
 	document.getElementById("deck").appendChild(card);
 }
+
+function updateScore(score){
+	scoreDiv.innerHTML = "Cards in your hand: " + score
+}
+
+document.addEventListener('keydown', function(event) {
+    if(event.key == 'm') {
+        slap();
+    }
+    if(event.key == 'z') {
+        place();
+    }
+});
+
+function disabled(msg) {
+	notTurn.innerHTML = msg
+	setTimeout(() => {
+		notTurn.innerHTML = ''
+	}, 3000);
+}
+

@@ -66,3 +66,7 @@
 .card .aceofspades {
 	color: goldenrod;
 }
+
+#notTurn {
+	color: red ;
+}

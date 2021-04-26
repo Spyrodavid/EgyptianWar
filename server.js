@@ -4,7 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 var id = 0
-var users = new Array
+var users = new Object
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -18,7 +18,19 @@ http.listen(port, () => {
 
 io.on('connection', socket=> {
 	io.emit('renderCard', {'Value':'A','Suit': 'spades'})
-    users[socket.id] = ''
+	var user = new Object
+	user['dead'] = false
+	user['turn'] = false
+	user['deck'] = []
+    users[socket.id] = user
+	console.log(users)
+
+	socket.on('slap',(socket)=>{
+		slapCard(socket.id)
+	})
+	socket.on('place',(socket)=>{
+		placeCard(socket.id)
+	})
     socket.on('disconnect', (socket)=> {
         getUsers().then((ids)=>{
 			for(user of Object.keys(users)){
@@ -29,11 +41,14 @@ io.on('connection', socket=> {
     })
 })
 
+
+
 async function getUsers(socket) {
     return await io.allSockets()
 }
 
-setInterval(()=>console.log(users),1000)
+
+setInterval(()=>{console.log(users)}, 1000)
 //Game Logic
 var cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 var suits = ["diamonds", "hearts", "spades", "clubs"];
@@ -42,6 +57,7 @@ var deck = new Array();
 function startGame() {
     dealCards(shuffle(getDeck()))
 }
+
 function getDeck()
 {
 	for(var i = 0; i < suits.length; i++)
@@ -71,12 +87,48 @@ function shuffle(deck)
 	}
 	return deck
 }
-
+//setInterval(dealCards,1000, deck)
 function dealCards(deck){
-    jump = Math.floor(deck.legnth/users.length)
-	for(x=0;x<users.legnth;x+=1){
-		deck.slice(x*jump, (x+1)*jump)
+	if (Object.keys(users).length>1){
+		var deckLen = deck.length
+		var usersLen = Object.keys(users).length
+		var jump = Math.floor(deckLen/usersLen)
+		var key = Object.keys(users)
+		for (var i = 0; i < usersLen; i++){
+			for (var x = 0; x < jump; x++){
+				users[key[i]]['deck'].push(deck.pop())
+			}
+		}
+		updateScore(22,Object.keys(users)[0])
+		console.log(users)
 	}
+}
+
+function placeCard(id){
+	if (users[id]['dead'] == true){
+		io.to(id).emit('placeDisabled', 'You can not place; You are dead')
+		return
+	}
+	if (users[id]['turn'] == false){ 
+		io.to(id).emit('placeDisabled', 'You can not place; It is not your turn')
+		return
+	}
+	else {
+		io.to(id).emit()
+	}
+}
+
+function slapCard(id){
+		if (users[id]['dead'] == true){
+		io.to(id).emit('slapDisabled', 'You can not slap; You are dead')
+		return
+	}
+	else {
+		io.to(id).emit()
+	}
+}
+function updateScore(score, id){
+	io.to(id).emit('updateScore', score)
 }
 
 startGame()
