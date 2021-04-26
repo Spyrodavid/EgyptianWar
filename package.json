@@ -2,7 +2,7 @@
   "name": "EgyptianWar",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,8 @@
     "trianglify": "^4.1.1"
   },
   "devDependencies": {
+    "eslint": "^7.25.0",
+    "eslint-config-strongloop": "^2.1.0",
     "nodemon": "^2.0.7"
   }
 }
