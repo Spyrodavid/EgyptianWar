@@ -26,10 +26,10 @@ io.on('connection', socket=> {
 	console.log(users)
 
 	socket.on('slap',(socket)=>{
-		slapCard(socket.id)
+		trySlapCard(socket.id)
 	})
 	socket.on('place',(socket)=>{
-		placeCard(socket.id)
+		tryPlaceCard(socket.id)
 	})
     socket.on('disconnect', (socket)=> {
         getUsers().then((ids)=>{
@@ -54,12 +54,13 @@ var cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 var suits = ["diamonds", "hearts", "spades", "clubs"];
 var deck = new Array();
 
+const cancelInterval = setInterval(startGame, 1000)
+
 function startGame() {
-	while (true){
-		if (Object.keys(users).length>1){
-			dealCards(shuffle(getDeck()))
-			return true
-		}
+	if (Object.keys(users).length>1){
+		dealCards(shuffle(getDeck()))
+		clearInterval(cancelInterval)
+		updateScore()
 	}
 }
 
@@ -103,11 +104,9 @@ function dealCards(deck){
 				users[key[i]]['deck'].push(deck.pop())
 			}
 		}
-		updateScore(22,Object.keys(users)[0])
-		console.log(users)
 }
 
-function placeCard(id){
+function tryPlaceCard(id){
 	if (users[id]['dead'] == true){
 		io.to(id).emit('placeDisabled', 'You can not place; You are dead')
 		return
@@ -123,24 +122,45 @@ function placeCard(id){
 	}
 }
 
-function slapCard(id){
+function trySlapCard(id){
 	if (users[id]['dead'] == true){
 		io.to(id).emit('slapDisabled', 'You can not slap; You are dead')
+		return
 	}
 	if (!slappable()) {
-
+		deck.unshift(users[id]['deck'].pop())
+		updateScore()
+	}
+	if (slappable()) {
+		users[id]['deck'] = deck.concat(users[id]['deck'])
+		deck = []
 	}
 }
 
 function slappable(){
 	let checkDeck = deck.slice(0,2)
+	let checkValue = []
 	for (card of checkDeck){
-		
+		if (card.Value == 'A' && card.Suit == 'spades'){
+			return true
+		}
+	}
+	for (card of checkDeck){
+		checkValue.push(card.Value)
+	}
+	if (checkValue[0] == checkValue[2] || checkValue[0] == checkValue[1] ){
+		return true
+	}
+	else {
+		return false
 	}
 }
 
-function updateScore(score, id){
-	io.to(id).emit('updateScore', score)
+
+function updateScore(){
+	for (user in Object.keys(users)){
+		io.to(user).emit('updateScore', users[user]['deck'].length)
+	}
 }
 
 startGame()
