@@ -1,5 +1,6 @@
-var scoreDiv = document.getElementById('score')
-var notTurn = document.getElementById('notTurn')
+var handscore = document.getElementById('handscore')
+var deckscore = document.getElementById('deckscore')
+var alert = document.getElementById('alert')
 function renderCard(deck)
 {
 	document.getElementById('deck').innerHTML = '';
@@ -35,9 +36,12 @@ function renderCard(deck)
 	document.getElementById("deck").appendChild(card);
 }
 
-function updateScore(score){
-	scoreDiv.innerHTML = "Cards in your hand: " + score
+function updateScores(scores){
+	handscore.innerHTML = "Cards in your hand: " + scores.hand
+	deckscore.innerHTML = "Cards in the deck: " + scores.deck
 }
+
+
 
 document.addEventListener('keydown', function(event) {
     if(event.key == 'm') {
@@ -49,9 +53,9 @@ document.addEventListener('keydown', function(event) {
 });
 
 function disabled(msg) {
-	notTurn.innerHTML = msg
+	alert.innerHTML = msg
 	setTimeout(() => {
-		notTurn.innerHTML = ''
+		alert.innerHTML = ''
 	}, 3000);
 }
 

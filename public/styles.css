@@ -13,22 +13,8 @@
 
 #deck {
 	display: flex;
-  justify-content: center;
+	justify-content: center;
 }
-.card2
-{
-            width: 50px;
-            padding: 10px;
-            border: solid 1px #808080;
-            background-color: white;
-            display: inline-block;
-            border-radius: 10px;
-            font-size: 22px;
-            text-align: center;
-            margin: 3px;
-            border:solid 3px;
-}
-
 
 .card .suit
 {
@@ -54,19 +40,21 @@
 	color: red;
 }
 
-.card .clubs
-{
-
-}
-
-.card .spades {
-
-}
-
 .card .aceofspades {
 	color: goldenrod;
 }
 
-#notTurn {
+#alert {
 	color: red ;
+}
+
+#deckscore {
+	position: absolute;
+	right:0 ;
+	top: 0;
+}
+#handscore{
+	position: absolute;
+	left: 0;
+	top: 0;
 }

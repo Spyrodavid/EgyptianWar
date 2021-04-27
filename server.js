@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 var users = new Object
 var order = new Array
+var orderIdx = new Number
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -17,38 +18,33 @@ http.listen(port, () => {
 });
 
 io.on('connection', socket=> {
-	io.emit('renderCard', {'Value':'A','Suit': 'spades'})
 	var user = new Object
 	user['dead'] = false
 	user['turn'] = false
 	user['deck'] = []
     users[socket.id] = user
-	console.log(users)
 
-	socket.on('slap',(socket)=>{
-		trySlapCard(socket.id)
+	socket.on('slap',(id)=>{
+		trySlapCard(id)
 	})
-	socket.on('place',(socket)=>{
-		tryPlaceCard(socket.id)
+	socket.on('place',(id)=>{
+		tryPlaceCard(id)
 	})
     socket.on('disconnect', (socket)=> {
         getUsers().then((ids)=>{
 			for(user of Object.keys(users)){
 				if (!ids.has(user)){
-					delete users[user]				
+					delete users[user]			
 			}}
 		})
     })
 })
-
-
 
 async function getUsers(socket) {
     return await io.allSockets()
 }
 
 
-setInterval(()=>{console.log(users)}, 1000)
 //Game Logic
 var cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 var suits = ["diamonds", "hearts", "spades", "clubs"];
@@ -60,7 +56,9 @@ function startGame() {
 	if (Object.keys(users).length>1){
 		dealCards(shuffle(getDeck()))
 		clearInterval(cancelInterval)
-		updateScore()
+		updateScores()
+		renderCard()
+		setOrder()
 	}
 }
 
@@ -93,6 +91,7 @@ function shuffle(deck)
 	}
 	return deck
 }
+
 //setInterval(dealCards,1000, deck)
 function dealCards(deck){
 		var deckLen = deck.length
@@ -117,24 +116,30 @@ function tryPlaceCard(id){
 		return
 	}
 	else {
-		deck.unshift(users[id]['deck'].pop())
-		io.emit('renderCard', deck[0] )
+		deck.unshift(users[id]['deck'].shift())
+		nextTurn()
 	}
+	renderCard()
+	updateScores()
+	checkDeath()
 }
 
 function trySlapCard(id){
 	if (users[id]['dead'] == true){
 		io.to(id).emit('slapDisabled', 'You can not slap; You are dead')
-		return
 	}
-	if (!slappable()) {
-		deck.unshift(users[id]['deck'].pop())
-		updateScore()
+	else if (!slappable()) {
+		deck.push(users[id]['deck'].shift())
 	}
-	if (slappable()) {
-		users[id]['deck'] = deck.concat(users[id]['deck'])
+	else if (slappable()) {
+		deck = deck.reverse()
+		users[id]['deck'] = users[id]['deck'].concat(deck)
 		deck = []
+		setTurn(id)
 	}
+	updateScores()
+	renderCard()
+	checkDeath()
 }
 
 function slappable(){
@@ -146,7 +151,7 @@ function slappable(){
 		}
 	}
 	for (card of checkDeck){
-		checkValue.push(card.Value)
+		checkValue.unshift(card.Value)
 	}
 	if (checkValue[0] == checkValue[2] || checkValue[0] == checkValue[1] ){
 		return true
@@ -157,10 +162,53 @@ function slappable(){
 }
 
 
-function updateScore(){
-	for (user in Object.keys(users)){
-		io.to(user).emit('updateScore', users[user]['deck'].length)
+function updateScores(){
+	for (user of Object.keys(users)){
+		io.to(user).emit('updateScores', {hand : users[user]['deck'].length, deck : deck.length})
 	}
 }
 
+function nextTurn(){
+	orderIdx += 1
+	if (!(orderIdx < order.length)){
+	orderIdx=0
+	}
+	setTurn(order[orderIdx])
+}
+
+function setTurn(id){
+	for (user in users){
+		users[user].turn = false
+	}
+	users[id].turn = true
+}
+
+function setOrder(){
+	for (user of Object.keys(users)){
+		order.push(user)
+	}
+	users[order[0]].turn = true
+}
+
+function renderCard(){
+	io.emit('renderCard', deck[0])
+}
+
+function checkDeath(){
+	for (user in users){
+		if(users[user].deck.length == 0){
+			users[user].dead = true
+		}
+	}
+}
+
+function checkWin(){
+	for (user in users){
+		if(users[user].deck.length >= 52){
+			users[user].dead = true
+		}
+	}
+}
 startGame()
+
+setInterval(()=>console.log(users), 5000)

@@ -1,15 +1,15 @@
 const socket = io()
 
 socket.on('joinGame', user =>{
-    console.log(user)
 })
 
 socket.on('renderCard', card =>{
     renderCard(card)
 })
 
-socket.on('updateScore', score =>{
-    updateScore(score)
+socket.on('updateScores', scores =>{
+    updateScores(scores)
+    console.log(scores)
 })
 
 socket.on('gameOver', state =>{
@@ -25,9 +25,9 @@ socket.on('placeDisabled', msg =>{
 })
 
 function slap(){
-    socket.emit('slap')
+    socket.emit('slap', socket.id)
 }
 
 function place(){
-	socket.emit('place')
+	socket.emit('place', socket.id)
 }
