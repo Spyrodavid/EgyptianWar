@@ -9,7 +9,6 @@ socket.on('renderCard', card =>{
 
 socket.on('updateScores', scores =>{
     updateScores(scores)
-    console.log(scores)
 })
 
 socket.on('gameOver', state =>{

@@ -46,11 +46,14 @@
 
 #alert {
 	color: red ;
+	position: absolute;
+	top: 60px;
+	left: 0;
 }
 
 #deckscore {
 	position: absolute;
-	right:0 ;
+	right: 0;
 	top: 0;
 }
 #handscore{
@@ -58,3 +61,21 @@
 	left: 0;
 	top: 0;
 }
+
+#gameStats{
+	position: absolute;
+	top: 168px;
+	left: 0;
+}
+
+#leaderboard{
+	position: absolute;
+	top: 168px;
+	right: 0;
+}
+
+.currentTurn{
+	color: darkcyan;
+	font-weight: bold;
+}
+

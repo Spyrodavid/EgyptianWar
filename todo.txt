@@ -1,3 +1,8 @@
-Death
-disconnect
-connect
+winning notif
+deck check animations
+face card stuff
+rule voting?
+progress bar?
+more things to do (modes)
+names
+isometric?

@@ -1,5 +1,9 @@
 var handscore = document.getElementById('handscore')
 var deckscore = document.getElementById('deckscore')
+var playersGame = document.getElementById('playersGame')
+var playersLobby = document.getElementById('playersLobby')
+var leaderboard = document.getElementById('leaderboard')
+
 var alert = document.getElementById('alert')
 function renderCard(deck)
 {
@@ -39,9 +43,28 @@ function renderCard(deck)
 function updateScores(scores){
 	handscore.innerHTML = "Cards in your hand: " + scores.hand
 	deckscore.innerHTML = "Cards in the deck: " + scores.deck
+	playersGame.innerHTML = "Players in Game: " + scores.playersGame
+	playersLobby.innerHTML = "Players in Lobby: " + scores.playersLobby
+	formatLeaderboard(scores.leaderboard)
 }
 
-
+function formatLeaderboard(ordering){
+	while (leaderboard.firstChild) {
+        leaderboard.removeChild(leaderboard.firstChild)
+	}
+	order = ordering[0]
+	orderIdx = ordering[1]
+	for (x=0; x < order.length; x++){
+		guy = document.createElement('span')
+		guy.innerHTML = order[x]+ "\n"
+		if (x == orderIdx){
+			guy.innerHTML = guy.innerHTML
+			guy.classList.add('currentTurn')
+		}
+		leaderboard.appendChild(guy)
+		leaderboard.appendChild(document.createElement('br'))
+	}
+}
 
 document.addEventListener('keydown', function(event) {
     if(event.key == 'm') {
@@ -53,9 +76,11 @@ document.addEventListener('keydown', function(event) {
 });
 
 function disabled(msg) {
-	alert.innerHTML = msg
+	let disable = document.createElement('div')
+	disable.innerHTML = msg
+	alert.appendChild(disable)
 	setTimeout(() => {
-		alert.innerHTML = ''
+		disable.remove()
 	}, 3000);
 }
 

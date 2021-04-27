@@ -24,6 +24,9 @@ io.on('connection', socket=> {
 	user['deck'] = []
     users[socket.id] = user
 
+	updateScores()
+	checkDeath()
+
 	socket.on('slap',(id)=>{
 		trySlapCard(id)
 	})
@@ -50,20 +53,21 @@ var cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 var suits = ["diamonds", "hearts", "spades", "clubs"];
 var deck = new Array();
 
-const cancelInterval = setInterval(startGame, 1000)
+var cancelIntervalVar = new String
 
 function startGame() {
 	if (Object.keys(users).length>1){
+		clearInterval(cancelIntervalVar)
 		dealCards(shuffle(getDeck()))
-		clearInterval(cancelInterval)
-		updateScores()
+		console.log(3)
 		renderCard()
 		setOrder()
+		updateScores()
 	}
 }
 
-function getDeck()
-{
+function getDeck() {
+	deck = []
 	for(var i = 0; i < suits.length; i++)
 	{
 		for(var x = 0; x < cards.length; x++)
@@ -92,7 +96,6 @@ function shuffle(deck)
 	return deck
 }
 
-//setInterval(dealCards,1000, deck)
 function dealCards(deck){
 		var deckLen = deck.length
 		var usersLen = Object.keys(users).length
@@ -122,6 +125,7 @@ function tryPlaceCard(id){
 	renderCard()
 	updateScores()
 	checkDeath()
+	checkWin()
 }
 
 function trySlapCard(id){
@@ -140,9 +144,13 @@ function trySlapCard(id){
 	updateScores()
 	renderCard()
 	checkDeath()
+	checkWin()
 }
 
 function slappable(){
+	if (deck.length == 0){
+		return false
+	}
 	let checkDeck = deck.slice(0,2)
 	let checkValue = []
 	for (card of checkDeck){
@@ -161,10 +169,15 @@ function slappable(){
 	}
 }
 
-
-function updateScores(){
-	for (user of Object.keys(users)){
-		io.to(user).emit('updateScores', {hand : users[user]['deck'].length, deck : deck.length})
+function updateScores() {
+	for (user of Object.keys(users)) {
+		io.to(user).emit('updateScores', {
+			hand: users[user]['deck'].length,
+			deck: deck.length,
+			playersLobby: Object.keys(users).length,
+			playersGame: order.length,
+			leaderboard: [order, orderIdx]
+		})
 	}
 }
 
@@ -203,12 +216,35 @@ function checkDeath(){
 }
 
 function checkWin(){
+	let winning = 0
+	checkDeath()
 	for (user in users){
-		if(users[user].deck.length >= 52){
-			users[user].dead = true
+		if(!users[user].dead){
+			winning+=1
 		}
 	}
+	if (winning <= 1){
+		console.log(1)
+		restartGame()
+	}
 }
-startGame()
 
-setInterval(()=>console.log(users), 5000)
+function restartGame() {
+	for (user in users){
+		users[user].deck = []
+		users[user].turn = false
+		users[user].dead = false
+	}
+	order = []
+	orderIdx = 0
+	if(cancelIntervalVar._destroyed){
+	cancelIntervalVar = setInterval(startGame, 1000)
+	}
+	console.log(2)
+	startGame()
+}
+
+setInterval(checkWin, 1000)
+
+
+//setInterval(()=>console.log(users), 10000)
